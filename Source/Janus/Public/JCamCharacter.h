@@ -3,8 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "InputActionValue.h"
 #include "JCamCharacter.generated.h"
+
+
+class UInputAction;
+class USpringArmComponent;
+class UCameraComponent;
+class UInputMappingContext;
 
 UCLASS()
 class JANUS_API AJCamCharacter : public ACharacter
@@ -17,7 +26,21 @@ public:
 
 protected:
 	// Called when the game starts or when spawned
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArmComp;
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* CameraComp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+	UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+	UInputAction* MoveAction;
+	
 	virtual void BeginPlay() override;
+
+	void Move(const FInputActionValue& Value);
+	
 
 public:	
 	// Called every frame
