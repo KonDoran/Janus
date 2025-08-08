@@ -34,7 +34,7 @@ void AJCamCharacter::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(InputMapping, 0);
+			Subsystem->AddMappingContext(PlayerInputMapping, 0);
 		}
 	}
 	
@@ -42,10 +42,21 @@ void AJCamCharacter::BeginPlay()
 
 void AJCamCharacter::Move(const FInputActionValue& Value)
 {
-	const bool CurrentValue = Value.Get<bool>();
-	if (CurrentValue)
+	const float DirectionValue = Value.Get<float>();
+	if (Controller && (DirectionValue != 0.f))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IA_Move triggered"));
+		FVector Upwards = FVector(0,0,1);
+		AddMovementInput(Upwards, DirectionValue);
+	}	
+}
+
+void AJCamCharacter::Look(const FInputActionValue& Value)
+{
+	const FVector2d LookAxisValue =  Value.Get<FVector2d>();
+	if (GetController())
+	{
+		AddControllerYawInput(LookAxisValue.X);
+		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }
 
@@ -65,6 +76,7 @@ void AJCamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered,this,&AJCamCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered,this,&AJCamCharacter::Look);
 	}
 
 }
